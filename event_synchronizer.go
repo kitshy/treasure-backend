@@ -26,6 +26,7 @@ func NewEventSynchronizer(ctx context.Context, conf *config.Config, shutdown con
 		return nil, err
 	}
 
+	log.Info("init event synchronizer ====== ", "chain_rpc_url", conf.Chain.ChainRpcUrl)
 	evmClient, err := node.NewEvmClient(ctx, conf.Chain.ChainRpcUrl)
 	if err != nil {
 		log.Error("init evm client error")

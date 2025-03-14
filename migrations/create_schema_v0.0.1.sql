@@ -12,12 +12,13 @@ END $$;
 
 CREATE TABLE IF NOT EXISTS block_headers (
     guid        VARCHAR PRIMARY KEY,
-    hash        VARCHAR PRIMARY KEY,
+    hash        VARCHAR NOT NULL UNIQUE,
     parent_hash VARCHAR NOT NULL UNIQUE,
     number      UINT256 NOT NULL UNIQUE,
     timestamp   INTEGER NOT NULL UNIQUE CHECK (timestamp > 0),
     rlp_bytes   VARCHAR NOT NULL
 );
+CREATE INDEX IF NOT EXISTS block_headers_hash ON block_headers(hash);
 CREATE INDEX IF NOT EXISTS block_headers_timestamp ON block_headers(timestamp);
 CREATE INDEX IF NOT EXISTS block_headers_number ON block_headers(number);
 

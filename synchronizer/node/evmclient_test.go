@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+const URL = "https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_"
+
 func setUp(url string) (EvmClient, error) {
 	client, err := NewEvmClient(context.Background(), url)
 	if err != nil {
@@ -19,7 +21,7 @@ func setUp(url string) (EvmClient, error) {
 
 func TestClient_BlockReceipts(t *testing.T) {
 
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +35,7 @@ func TestClient_BlockReceipts(t *testing.T) {
 }
 func TestClient_TransactionReceipts(t *testing.T) {
 
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +48,7 @@ func TestClient_TransactionReceipts(t *testing.T) {
 }
 
 func TestClient_NewFilter(t *testing.T) {
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +62,7 @@ func TestClient_NewFilter(t *testing.T) {
 }
 
 func TestClient_UninstallFilter(t *testing.T) {
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +75,7 @@ func TestClient_UninstallFilter(t *testing.T) {
 }
 
 func TestClient_FilterChanges(t *testing.T) {
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +88,7 @@ func TestClient_FilterChanges(t *testing.T) {
 }
 
 func TestClient_FilterLogs(t *testing.T) {
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +105,7 @@ func TestClient_FilterLogs(t *testing.T) {
 
 func TestClient_GetLogs(t *testing.T) {
 
-	client, err := setUp("https://eth-sepolia.g.alchemy.com/v2/tQ6olBJhhJY0_v04kavsliE758vz_qE_")
+	client, err := setUp(URL)
 	if err != nil {
 		t.Fatal(err)
 	}

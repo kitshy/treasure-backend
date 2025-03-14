@@ -4,8 +4,6 @@ const ChainIdRedisKey = "chainId:%s"
 const ChainId = "chainId"
 const ChainName = "chainName"
 
-const Polygon = "Polygon"
-
 const RpcReturnCodeSuccess = 0
 const RpcReturnCodeError = 1
 

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/kitshy/treasure-backend/database/chain"
 	"github.com/kitshy/treasure-backend/database/event"
 	"os"
@@ -32,7 +33,7 @@ func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
 		dsn += fmt.Sprintf(" user=%s", dbConfig.User)
 	}
 	if dbConfig.Pass != "" {
-		dsn += fmt.Sprintf(" password=%s", &dbConfig.Pass)
+		dsn += fmt.Sprintf(" password=%s", dbConfig.Pass)
 	}
 
 	gromConfig := gorm.Config{
@@ -40,6 +41,7 @@ func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
 		CreateBatchSize:        3_000,
 	}
 
+	log.Info("db config .. ", dsn)
 	retryStrategy := &retry.ExponentialStrategy{Min: 1000, Max: 20_000, MaxJitter: 250}
 	gorm, err := retry.Do[*gorm.DB](context.Background(), 3, retryStrategy, func() (*gorm.DB, error) {
 		gorm, err := gorm.Open(postgres.Open(dsn), &gromConfig)
