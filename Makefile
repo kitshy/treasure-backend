@@ -5,6 +5,9 @@ LDFLAGSSTRING +=-X main.GitCommit=$(GITCOMMIT)
 LDFLAGSSTRING +=-X main.GitDate=$(GITDATE)
 LDFLAGS := -ldflags "$(LDFLAGSSTRING)"
 
+TM_ABI_ARTIFACT := /Users/kit/code/go/com.web3/src/treasure-backend/abis/TreasureManager.sol/TreasureManager.json
+ABIGEN := /Users/kit/code/go/com.web3/bin/abigen
+
 treasure-backed:
 	env GO111MODULE=on go build -o treasure-backend -v $(LDFLAGS) ./cmd
 
@@ -25,7 +28,7 @@ bindings:
 
 	cat $(TM_ABI_ARTIFACT) \
 		| jq .abi \
-		| abigen --pkg bindings \
+		| $(ABIGEN) --pkg bindings \
 		--abi - \
 		--out bindings/treasure_manager.go \
 		--type TreasureManager \

@@ -3,25 +3,29 @@ package database
 import (
 	"context"
 	"fmt"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/kitshy/treasure-backend/database/chain"
-	"github.com/kitshy/treasure-backend/database/event"
+	"github.com/kitshy/treasure-backend/database/eventlog"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"os"
 	"path/filepath"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
 	"github.com/pkg/errors"
+
+	"github.com/ethereum/go-ethereum/log"
+
+	"github.com/kitshy/treasure-backend/database/chain"
+	"github.com/kitshy/treasure-backend/database/event"
 
 	"github.com/kitshy/treasure-backend/common/retry"
 	"github.com/kitshy/treasure-backend/config"
+	_ "github.com/kitshy/treasure-backend/database/utils/serializers"
 )
 
 type DB struct {
 	gorm           *gorm.DB
 	BlockHeaders   chain.BlockHeadersDB
 	ContractEvents event.ContractEventsDB
+	DepositTokens  eventlog.DepositTokensDB
 }
 
 func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
@@ -58,7 +62,20 @@ func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
 		gorm:           gorm,
 		ContractEvents: event.NewContractEventsDB(gorm),
 		BlockHeaders:   chain.NewBlockHeaders(gorm),
+		DepositTokens:  eventlog.NewDepositTokensDB(gorm),
 	}, nil
+}
+
+func (db *DB) Transaction(fn func(db *DB) error) error {
+	return db.gorm.Transaction(func(tx *gorm.DB) error {
+		txDB := &DB{
+			gorm:           tx,
+			BlockHeaders:   chain.NewBlockHeaders(tx),
+			ContractEvents: event.NewContractEventsDB(tx),
+			DepositTokens:  eventlog.NewDepositTokensDB(tx),
+		}
+		return fn(txDB)
+	})
 }
 
 func (db *DB) Close() error {

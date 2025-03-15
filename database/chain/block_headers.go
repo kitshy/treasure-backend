@@ -13,9 +13,13 @@ type BlockHeaders struct {
 	GUID       uuid.UUID   `gorm:"primaryKey"`
 	Hash       common.Hash `gorm:"serializer:bytes"`
 	ParentHash common.Hash `gorm:"serializer:bytes"`
-	Number     big.Int     `gorm:"serializer:u256"`
+	Number     *big.Int    `gorm:"serializer:u256"`
 	Timestamp  uint64
 	RlpHeader  *utils.RLPHeader `gorm:"serializer:rlp;column:rlp_bytes"`
+}
+
+func (BlockHeaders) TableName() string {
+	return "block_headers"
 }
 
 type blockHeadersDB struct {
@@ -54,13 +58,14 @@ func (b blockHeadersDB) QueryBlockHeadersByID(id uuid.UUID) (*BlockHeaders, erro
 }
 
 func (b blockHeadersDB) LatestBlockHeader() (*BlockHeaders, error) {
-	blockHeaders := &BlockHeaders{}
-	result := b.gorm.Order("number desc").Take(blockHeaders)
+	var header BlockHeaders
+	result := b.gorm.Table("block_headers").Order("number DESC").Take(&header)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, result.Error
 	}
-	return blockHeaders, nil
+	return &header, nil
+
 }

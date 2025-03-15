@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"math/big"
@@ -17,6 +18,44 @@ func setUp(url string) (EvmClient, error) {
 		panic(err)
 	}
 	return client, nil
+}
+
+func TestClient_BlockHeaderByNumber(t *testing.T) {
+	client, err := setUp(URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rsp, err := client.BlockHeaderByNumber(big.NewInt(7872316))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(rsp)
+}
+
+func TestClient_LatestFinalizedBlockHeader(t *testing.T) {
+
+	client, err := setUp(URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rsp, err := client.LatestFinalizedBlockHeader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(rsp)
+
+}
+
+func TestClient_BlockHeadersByRange(t *testing.T) {
+	client, err := setUp(URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rsp, err := client.BlockHeadersByRange(big.NewInt(7872319), big.NewInt(7872321), 11155111)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(rsp)
 }
 
 func TestClient_BlockReceipts(t *testing.T) {
@@ -119,4 +158,20 @@ func TestClient_GetLogs(t *testing.T) {
 
 	t.Log(rsp)
 
+}
+
+func TestClient_BatchBlockAndLogs(t *testing.T) {
+	client, err := setUp(URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rsp, err := client.BatchBlockAndLogs(ethereum.FilterQuery{
+		Addresses: []common.Address{common.HexToAddress("0xDFC97b057eF039772F1bD7e8acf18949B660Cff1")},
+		FromBlock: big.NewInt(7872319),
+		ToBlock:   big.NewInt(7872321),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(rsp)
 }

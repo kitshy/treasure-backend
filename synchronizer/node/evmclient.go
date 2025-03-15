@@ -49,6 +49,8 @@ type EvmClient interface {
 
 	GetLogs(*big.Int, *big.Int, common.Address) ([]types.Log, error)
 
+	BatchBlockAndLogs(ethereum.FilterQuery) (BlockAndLogs, error)
+
 	Close()
 }
 
@@ -350,6 +352,41 @@ func (c Client) GetLogs(fromBlock *big.Int, toBlock *big.Int, contractAddress co
 		return []types.Log{}, err
 	}
 	return logs, nil
+}
+
+func (c Client) BatchBlockAndLogs(query ethereum.FilterQuery) (BlockAndLogs, error) {
+
+	params, err := toFilterArg(query)
+	if err != nil {
+		return BlockAndLogs{}, err
+	}
+
+	var logResult []types.Log
+	var blockResult types.Header
+
+	batchElems := make([]rpc.BatchElem, 2)
+	batchElems[0] = rpc.BatchElem{
+		Method: "eth_getBlockByNumber",
+		Args:   []interface{}{toBlockNumArg(query.ToBlock), false},
+		Result: &blockResult,
+	}
+	batchElems[1] = rpc.BatchElem{
+		Method: "eth_getLogs",
+		Args:   []interface{}{params},
+		Result: &logResult,
+	}
+
+	ctxwt, cancel := context.WithTimeout(context.Background(), defaultRequestTimeout)
+	defer cancel()
+
+	err = c.rpc.BatchCallContext(ctxwt, batchElems)
+	if err != nil {
+		return BlockAndLogs{}, err
+	}
+	return BlockAndLogs{
+		Logs:          logResult,
+		ToBlockHeader: &blockResult,
+	}, nil
 }
 
 func (c Client) Close() {

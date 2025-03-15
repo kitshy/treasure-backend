@@ -25,7 +25,7 @@ CREATE INDEX IF NOT EXISTS block_headers_number ON block_headers(number);
 
 CREATE TABLE IF NOT EXISTS contract_events (
     guid             VARCHAR PRIMARY KEY,
-    block_hash       VARCHAR NOT NULL REFERENCES block_headers(hash) ON DELETE CASCADE,
+    block_hash       VARCHAR NOT NULL,
     contract_address VARCHAR NOT NULL,
     transaction_hash VARCHAR NOT NULL,
     log_index        INTEGER NOT NULL,
@@ -37,3 +37,14 @@ CREATE INDEX IF NOT EXISTS contract_events_timestamp ON contract_events(timestam
 CREATE INDEX IF NOT EXISTS contract_events_block_hash ON contract_events(block_hash);
 CREATE INDEX IF NOT EXISTS contract_events_event_signature ON contract_events(event_signature);
 CREATE INDEX IF NOT EXISTS contract_events_contract_address ON contract_events(contract_address);
+
+CREATE TABLE IF NOT EXISTS deposit_tokens (
+                                              guid                          VARCHAR PRIMARY KEY,
+                                              block_number                  UINT256 NOT NULL,
+                                              token_address                 VARCHAR NOT NULL,
+                                              sender                        VARCHAR NOT NULL,
+                                              amount                        UINT256,
+                                              timestamp                     INTEGER NOT NULL CHECK (timestamp > 0)
+    );
+CREATE INDEX IF NOT EXISTS deposit_tokens_sender ON deposit_tokens(sender);
+CREATE INDEX IF NOT EXISTS deposit_tokens_timestamp ON deposit_tokens(timestamp);

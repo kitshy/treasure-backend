@@ -16,7 +16,7 @@ type ContractEvents struct {
 	LogIndex        uint64
 	EventSignature  common.Hash `gorm:"serializer:bytes"`
 	Timestamp       uint64
-	RlpLogs         *types.Log `gorm:"serializer:rlp;column:rlp_bytes"`
+	RlpLogs         *types.Log `gorm:"serializer:rlp;column:rlp_log"`
 }
 
 type contractEventsDB struct {
@@ -66,7 +66,7 @@ func (c *contractEventsDB) SaveContractEvents(events *[]ContractEvents) error {
 }
 
 func (c *contractEventsDB) QueryContractEventsByID(id uuid.UUID) (*ContractEvents, error) {
-	contractEvents := &ContractEvents{}
+	var contractEvents ContractEvents
 	result := c.gorm.Where(&ContractEvents{GUID: id}).Take(&contractEvents)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -74,5 +74,5 @@ func (c *contractEventsDB) QueryContractEventsByID(id uuid.UUID) (*ContractEvent
 		}
 		return nil, result.Error
 	}
-	return contractEvents, nil
+	return &contractEvents, nil
 }
