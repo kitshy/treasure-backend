@@ -43,9 +43,10 @@ func TestBlockHeadersDB_LatestBlockHeader(t *testing.T) {
 	t.Log(rsp)
 }
 
-func TestBlockHeadersDB_InsertBlockHeader(t *testing.T) {
+func TestBlockHeadersDB_QueryBlockHeaders(t *testing.T) {
 	db := setUp()
-	rsp, err := db.BlockHeaders.QueryBlockHeaders(&chain.BlockHeaders{Number: big.NewInt(7872329)})
+	startHeight := new(big.Int).SetUint64(7872329)
+	rsp, err := db.BlockHeaders.QueryBlockHeaders(&chain.BlockHeaders{Number: startHeight})
 	if err != nil {
 		t.Fatal(err)
 	}

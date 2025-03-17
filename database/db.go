@@ -22,10 +22,11 @@ import (
 )
 
 type DB struct {
-	gorm           *gorm.DB
-	BlockHeaders   chain.BlockHeadersDB
-	ContractEvents event.ContractEventsDB
-	DepositTokens  eventlog.DepositTokensDB
+	gorm              *gorm.DB
+	BlockHeaders      chain.BlockHeadersDB
+	ContractEvents    event.ContractEventsDB
+	DepositTokens     eventlog.DepositTokensDB
+	GrantRewardTokens eventlog.GrantRewardTokensDB
 }
 
 func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
@@ -59,20 +60,22 @@ func NewDB(ctx context.Context, dbConfig config.DBConfig) (*DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 	return &DB{
-		gorm:           gorm,
-		ContractEvents: event.NewContractEventsDB(gorm),
-		BlockHeaders:   chain.NewBlockHeaders(gorm),
-		DepositTokens:  eventlog.NewDepositTokensDB(gorm),
+		gorm:              gorm,
+		ContractEvents:    event.NewContractEventsDB(gorm),
+		BlockHeaders:      chain.NewBlockHeaders(gorm),
+		DepositTokens:     eventlog.NewDepositTokensDB(gorm),
+		GrantRewardTokens: eventlog.NewGrantRewardTokensDB(gorm),
 	}, nil
 }
 
 func (db *DB) Transaction(fn func(db *DB) error) error {
 	return db.gorm.Transaction(func(tx *gorm.DB) error {
 		txDB := &DB{
-			gorm:           tx,
-			BlockHeaders:   chain.NewBlockHeaders(tx),
-			ContractEvents: event.NewContractEventsDB(tx),
-			DepositTokens:  eventlog.NewDepositTokensDB(tx),
+			gorm:              tx,
+			BlockHeaders:      chain.NewBlockHeaders(tx),
+			ContractEvents:    event.NewContractEventsDB(tx),
+			DepositTokens:     eventlog.NewDepositTokensDB(tx),
+			GrantRewardTokens: eventlog.NewGrantRewardTokensDB(tx),
 		}
 		return fn(txDB)
 	})

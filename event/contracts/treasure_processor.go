@@ -33,8 +33,9 @@ func TreasureProcessor(db *database.DB, conf config.ChainConfig, fromHeight *big
 	}
 
 	var txDepositTokens []eventlog.DepositTokens
-	var txGrantRewardTokens = []eventlog.GrantRewardTokens{}
+	var txGrantRewardTokens []eventlog.GrantRewardTokens
 
+	log.Info("contractEvents count ", len(*contractEvents))
 	for _, contractEvent := range *contractEvents {
 		rlpLog := contractEvent.RlpLogs
 		if contractEvent.EventSignature.String() == treasureManagerAbi.Events["DepositToken"].ID.String() {
@@ -59,6 +60,21 @@ func TreasureProcessor(db *database.DB, conf config.ChainConfig, fromHeight *big
 			// todo
 		}
 	}
+
+	if len(txDepositTokens) > 0 {
+		if err := db.DepositTokens.SaveDepositTokens(&txDepositTokens); err != nil {
+			log.Error("save deposit tokens fail", "err", err)
+			return err
+		}
+	}
+
+	if len(txGrantRewardTokens) > 0 {
+		if err := db.GrantRewardTokens.SaveGrantRewardTokens(&txGrantRewardTokens); err != nil {
+			log.Error("save grant reward tokens fail", "err", err)
+			return err
+		}
+	}
+
 	return nil
 }
 

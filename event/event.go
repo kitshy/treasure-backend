@@ -30,17 +30,17 @@ type Event struct {
 
 func NewEvent(conf *config.Config, db *database.DB, shutdown context.CancelCauseFunc) (*Event, error) {
 
+	startHeight := new(big.Int).SetUint64(conf.Chain.StartHeight)
+
 	LatestBlock, err := db.BlockHeaders.LatestBlockHeader()
 	if err != nil {
 		return nil, err
 	}
 
-	startHeight := new(big.Int).SetUint64(conf.Chain.StartHeight)
-
 	if LatestBlock.Number.Cmp(startHeight) < 0 {
 		return nil, fmt.Errorf("conf start height %d is too high", conf.Chain.StartHeight)
 	} else if LatestBlock.Number.Cmp(startHeight) > 0 {
-		block, err := db.BlockHeaders.QueryBlockHeaders(&chain.BlockHeaders{Number: startHeight})
+		block, err := db.BlockHeaders.QueryBlockHeaders(&chain.BlockHeaders{Number: new(big.Int).Add(startHeight, bigint.One)})
 		if err != nil {
 			return nil, err
 		}
@@ -49,6 +49,8 @@ func NewEvent(conf *config.Config, db *database.DB, shutdown context.CancelCause
 		}
 		LatestBlock = &block[0]
 	}
+
+	log.Info("init LatestBlock is : ", LatestBlock.Number)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Event{
@@ -78,7 +80,6 @@ func (e *Event) Start() error {
 				return err
 			}
 		}
-
 		return nil
 	})
 
@@ -122,5 +123,6 @@ func (e *Event) processTreasureEvent() error {
 		return err
 	}
 	e.LatestBlockHeader = latestHeader
+	log.Info("finished processing treasure manager events...end block..", latestHeader.Number)
 	return nil
 }

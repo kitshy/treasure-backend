@@ -4,6 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
+	"strconv"
+	"sync/atomic"
+	"time"
+
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -13,18 +18,19 @@ import (
 	"github.com/kitshy/treasure-backend/api/validator"
 	"github.com/kitshy/treasure-backend/config"
 	"github.com/kitshy/treasure-backend/database"
-	"net"
-	"strconv"
-	"sync/atomic"
-	"time"
 )
 
 const (
 	HealthPath = "/healthz"
 
-	DepositTokensV1Path     = "/api/v1/deposit/tokens"
-	GrantRewardTokensV1Path = "/api/v1/grant/tokens"
+	GetDepositTokensListV1Path = "/api/v1/deposit/GetDepositTokensList"
+	GetGrantRewardTokensV1Path = "/api/v1/grant/GetGrantRewardTokens"
 )
+
+type APIConfig struct {
+	HTTPServer    config.ServerConfig
+	MetricsServer config.ServerConfig
+}
 
 type Api struct {
 	router    *chi.Mux
@@ -101,10 +107,10 @@ func (api *Api) initRoute(ctx context.Context, cfg *config.Config) error {
 	apiRouter.Use(middleware.Heartbeat(HealthPath))
 
 	// deposit token
-	apiRouter.Get(fmt.Sprintf(DepositTokensV1Path), service.GetDepositTokensListHandler)
+	apiRouter.Get(fmt.Sprintf(GetDepositTokensListV1Path), service.GetDepositTokensListHandler)
 
 	// grant reward token
-	apiRouter.Get(fmt.Sprintf(DepositTokensV1Path), service.GetGrantRewardTokensListHandler)
+	apiRouter.Get(fmt.Sprintf(GetGrantRewardTokensV1Path), service.GetGrantRewardTokensListHandler)
 
 	api.router = apiRouter
 	return nil

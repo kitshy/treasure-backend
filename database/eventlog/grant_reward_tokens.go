@@ -25,18 +25,19 @@ type GrantRewardTokensViews interface {
 }
 
 type GrantRewardTokensDB interface {
-	SaveGrantRewardTokens([]*GrantRewardTokens) error
+	SaveGrantRewardTokens(*[]GrantRewardTokens) error
 }
 
 func NewGrantRewardTokensDB(db *gorm.DB) GrantRewardTokensDB {
 	return &grantRewardTokensDB{gorm: db}
 }
 
-func (*grantRewardTokensDB) QueryGrantRewardTokensByID(id uuid.UUID) ([]GrantRewardTokens, error) {
+func (g *grantRewardTokensDB) QueryGrantRewardTokensByID(id uuid.UUID) ([]GrantRewardTokens, error) {
 	result := []GrantRewardTokens{}
 	return result, nil
 }
 
-func (*grantRewardTokensDB) SaveGrantRewardTokens(grantRewardTokens []*GrantRewardTokens) error {
-	return nil
+func (g *grantRewardTokensDB) SaveGrantRewardTokens(grantRewardTokens *[]GrantRewardTokens) error {
+	result := g.gorm.CreateInBatches(&grantRewardTokens, len(*grantRewardTokens))
+	return result.Error
 }

@@ -2,6 +2,7 @@ package treasure_backend
 
 import (
 	"context"
+	"github.com/kitshy/treasure-backend/event"
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/log"
@@ -13,6 +14,7 @@ import (
 
 type EventSynchronizer struct {
 	synchronizer *synchronizer.Synchronizer
+	event        *event.Event
 
 	shutdown context.CancelCauseFunc
 	stopped  atomic.Bool
@@ -39,9 +41,16 @@ func NewEventSynchronizer(ctx context.Context, conf *config.Config, shutdown con
 		return nil, err
 	}
 
+	event, err := event.NewEvent(conf, db, shutdown)
+	if err != nil {
+		log.Error("init event error")
+		return nil, err
+	}
+
 	return &EventSynchronizer{
 		synchronizer: synchronizer,
 		shutdown:     shutdown,
+		event:        event,
 	}, nil
 
 }
@@ -52,6 +61,10 @@ func (s *EventSynchronizer) Start(ctx context.Context) error {
 		log.Error("start treasure synchronizer error")
 		return err
 	}
+	if err := s.event.Start(); err != nil {
+		log.Error("start treasure synchronizer error")
+		return err
+	}
 	return nil
 }
 
@@ -59,6 +72,10 @@ func (s *EventSynchronizer) Stop(ctx context.Context) error {
 	err := s.synchronizer.Close()
 	if err != nil {
 		log.Error("close treasure synchronizer error")
+		return err
+	}
+	if err := s.event.Close(); err != nil {
+		log.Error("close event error")
 		return err
 	}
 	return nil
