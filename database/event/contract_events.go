@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"math/big"
 )
 
 type ContractEvents struct {
@@ -25,6 +26,7 @@ type contractEventsDB struct {
 
 type ContractEventsViews interface {
 	QueryContractEventsByID(uuid.UUID) (*ContractEvents, error)
+	ContractEventsWithFilter(ContractEvents, *big.Int, *big.Int) (*[]ContractEvents, error)
 }
 
 type ContractEventsDB interface {
@@ -68,6 +70,22 @@ func (c *contractEventsDB) SaveContractEvents(events *[]ContractEvents) error {
 func (c *contractEventsDB) QueryContractEventsByID(id uuid.UUID) (*ContractEvents, error) {
 	var contractEvents ContractEvents
 	result := c.gorm.Where(&ContractEvents{GUID: id}).Take(&contractEvents)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &contractEvents, nil
+}
+
+func (c *contractEventsDB) ContractEventsWithFilter(events ContractEvents, start *big.Int, end *big.Int) (*[]ContractEvents, error) {
+	var contractEvents []ContractEvents
+	result := c.gorm.Table("contract_events").
+		Joins("inner join block_headers ON block_headers.hash = contract_events.block_hash").
+		Where("block_headers.number > ? and block_headers.number < ?", start, end).
+		Order("block_headers.number ASC").
+		Find(&contractEvents)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil

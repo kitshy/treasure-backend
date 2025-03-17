@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ethereum/go-ethereum/log"
 	treasure_backend "github.com/kitshy/treasure-backend"
+	"github.com/kitshy/treasure-backend/api"
 	"github.com/kitshy/treasure-backend/common/cliapp"
 	"github.com/urfave/cli/v2"
 
@@ -12,8 +13,17 @@ import (
 	"github.com/kitshy/treasure-backend/database"
 )
 
+func runApi(ctx *cli.Context, shutdown context.CancelCauseFunc) (cliapp.Lifecycle, error) {
+	log.Info("run treasure-backend api ")
+	config, err := config.NewConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return api.NewApi(config, ctx.Context)
+}
+
 func runEventSyn(ctx *cli.Context, shutdown context.CancelCauseFunc) (cliapp.Lifecycle, error) {
-	log.Info("run event syn")
+	log.Info("run treasure-backend event syn")
 	config, err := config.NewConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -54,6 +64,12 @@ func NewCli(GitCommit string, GitDate string) *cli.App {
 		EnableBashCompletion: true,
 
 		Commands: []*cli.Command{
+			{
+				Name:        "api",
+				Flags:       flags,
+				Description: "run api server",
+				Action:      cliapp.LifecycleCmd(runApi),
+			},
 			{
 				Name:        "eventSyn",
 				Flags:       flags,

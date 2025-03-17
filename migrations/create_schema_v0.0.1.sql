@@ -38,6 +38,7 @@ CREATE INDEX IF NOT EXISTS contract_events_block_hash ON contract_events(block_h
 CREATE INDEX IF NOT EXISTS contract_events_event_signature ON contract_events(event_signature);
 CREATE INDEX IF NOT EXISTS contract_events_contract_address ON contract_events(contract_address);
 
+
 CREATE TABLE IF NOT EXISTS deposit_tokens (
                                               guid                          VARCHAR PRIMARY KEY,
                                               block_number                  UINT256 NOT NULL,
@@ -48,3 +49,15 @@ CREATE TABLE IF NOT EXISTS deposit_tokens (
     );
 CREATE INDEX IF NOT EXISTS deposit_tokens_sender ON deposit_tokens(sender);
 CREATE INDEX IF NOT EXISTS deposit_tokens_timestamp ON deposit_tokens(timestamp);
+
+
+CREATE TABLE IF NOT EXISTS grant_reward_tokens (
+                                                   guid                          VARCHAR PRIMARY KEY,
+                                                   block_number                  UINT256 NOT NULL,
+                                                   token_address                 VARCHAR NOT NULL,
+                                                   granter                       VARCHAR NOT NULL,
+                                                   amount                        UINT256,
+                                                   timestamp                     INTEGER NOT NULL CHECK (timestamp > 0)
+    );
+CREATE INDEX IF NOT EXISTS grant_reward_tokens_token_address ON grant_reward_tokens(token_address);
+CREATE INDEX IF NOT EXISTS grant_reward_tokens_timestamp ON grant_reward_tokens(timestamp);

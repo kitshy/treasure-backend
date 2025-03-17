@@ -29,6 +29,8 @@ type blockHeadersDB struct {
 type BlockHeadersViews interface {
 	QueryBlockHeadersByID(uuid.UUID) (*BlockHeaders, error)
 	LatestBlockHeader() (*BlockHeaders, error)
+	QueryBlockHeaders(*BlockHeaders) ([]BlockHeaders, error)
+	BlockHeaderWithScope(func(db *gorm.DB) *gorm.DB) (*BlockHeaders, error)
 }
 
 type BlockHeadersDB interface {
@@ -67,5 +69,29 @@ func (b blockHeadersDB) LatestBlockHeader() (*BlockHeaders, error) {
 		return nil, result.Error
 	}
 	return &header, nil
+}
 
+func (b blockHeadersDB) QueryBlockHeaders(param *BlockHeaders) ([]BlockHeaders, error) {
+	var blockHeaders []BlockHeaders
+	result := b.gorm.Where(&param).Take(&blockHeaders)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return blockHeaders, nil
+
+}
+
+func (b blockHeadersDB) BlockHeaderWithScope(f func(db *gorm.DB) *gorm.DB) (*BlockHeaders, error) {
+	var header BlockHeaders
+	result := b.gorm.Table("block_headers").Scopes(f).Take(&header)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &header, nil
 }
