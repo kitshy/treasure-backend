@@ -12,11 +12,11 @@ import (
 
 func setUp() *database.DB {
 	df := config.DBConfig{
-		Host: "157.173.116.33",
+		Host: "",
 		Port: 5432,
 		User: "root",
 		Name: "treasure",
-		Pass: "shy000",
+		Pass: "",
 	}
 	db, err := database.NewDB(context.Background(), df)
 	if err != nil {
