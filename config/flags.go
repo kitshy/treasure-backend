@@ -128,6 +128,58 @@ var (
 		Usage:   "",
 		EnvVars: prefixEnvVars("SLAVE_DB_NAME"),
 	}
+
+	// call contracts config chain info same as chain config
+	PrivateKeyNameFlags = &cli.StringFlag{
+		Name:    "private-key-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("PRIVATE_KEY_NAME"),
+	}
+	MnemonicNameFlags = &cli.StringFlag{
+		Name:    "mnemonic-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("MNEMONIC_NAME"),
+	}
+	SequencerHDPathNameFlags = &cli.StringFlag{
+		Name:    "sequencer-hd-path-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("SEQUENCER_HD_PATH_NAME"),
+	}
+	PasswordNameFlags = &cli.StringFlag{
+		Name:    "password-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("PASSWORD_NAME"),
+	}
+	NumConfirmationsNameFlags = &cli.StringFlag{
+		Name:    "num-confirmations-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("NUM_CONFIRMATIONS_NAME"),
+	}
+	SafeAbortNonceTooLowCountNameFlags = &cli.StringFlag{
+		Name:    "safe-abort-nonce-too-low-count-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("SAFE_ABORT_NONCE_TOO_LOW_COUNT_NAME"),
+	}
+	EnableHsmNameFlags = &cli.StringFlag{
+		Name:    "enable-hsm-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("ENABLE_HSM_NAME"),
+	}
+	HsmAPINameFlags = &cli.StringFlag{
+		Name:    "hsm-api-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("HSM_API_NAME"),
+	}
+	HsmCredenNameFlags = &cli.StringFlag{
+		Name:    "hsm-creden-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("HSM_CREDEN_NAME"),
+	}
+	HsmAddressNameFlags = &cli.StringFlag{
+		Name:    "hsm-address-name",
+		Usage:   "",
+		EnvVars: prefixEnvVars("HSM_ADDRESS_NAME"),
+	}
 )
 
 var requiredFlags = []cli.Flag{
@@ -152,6 +204,16 @@ var optionalFlags = []cli.Flag{
 	SlaveDbUserFlags,
 	SlaveDbPasswordFlags,
 	SlaveDbNameFlags,
+	PrivateKeyNameFlags,
+	MnemonicNameFlags,
+	SequencerHDPathNameFlags,
+	PasswordNameFlags,
+	NumConfirmationsNameFlags,
+	SafeAbortNonceTooLowCountNameFlags,
+	EnableHsmNameFlags,
+	HsmAPINameFlags,
+	HsmCredenNameFlags,
+	HsmAddressNameFlags,
 }
 
 func init() {
