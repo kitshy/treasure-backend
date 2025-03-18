@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	common2 "github.com/kitshy/treasure-backend/common/crypto"
-	"github.com/the-web3/contracts-caller/ethereumcli"
+	"github.com/kitshy/treasure-backend/rpccall/ethcli"
 	"math/big"
 	"strings"
 	"sync"
@@ -68,7 +68,7 @@ func NewContractCaller(ctx context.Context, conf *config.CallContractsConfig) (C
 		walletAddr = crypto.PubkeyToAddress(callerPrivateKey.PublicKey)
 	}
 
-	ethClient, err := ethereumcli.EthClientWithTimeout(ctx, conf.ChainRpcUrl)
+	ethClient, err := ethcli.EthClientWithTimeout(ctx, conf.ChainRpcUrl)
 	if err != nil {
 		return nil, err
 	}
