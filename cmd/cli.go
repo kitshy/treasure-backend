@@ -38,6 +38,7 @@ func runMigrations(ctx *cli.Context) error {
 		log.Error("Failed to load config", "err", err)
 		return err
 	}
+
 	ctx.Context = opio.CancelOnInterrupt(ctx.Context)
 	db, err := database.NewDB(ctx.Context, conf.MasterDB)
 	if err != nil {
